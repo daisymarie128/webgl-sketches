@@ -7,67 +7,65 @@
 		------------------------------------ */
 
 
-var container,
-		camera, 
-		scene, 
-		renderer,
-		mesh, 
-		geometry,
-		color,
-		spheres = [];
-
-var windowHalfX = window.innerWidth / 2;
-var windowHalfY = window.innerHeight / 2;
+var container;
+var camera, scene, renderer;
+var uniforms;
 
 init();
 animate();
 
 function init() {
+	
+    container = document.getElementById( 'container' );
+    camera = new THREE.Camera();
+    camera.position.z = 1;
+    scene = new THREE.Scene();
 
-	container = document.getElementById('container');
+    var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
 
-	// setup camera, scene and renderer
-	camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
-	camera.position.z = 3200;
-	scene = new THREE.Scene();
-	renderer = new THREE.WebGLRenderer();
-	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.autoClear = false;
-	container.appendChild( renderer.domElement );
+    uniforms = {
+        u_time: { type: "f", value: 1.0 },
+        u_resolution: { type: "v2", value: new THREE.Vector2() },
+        u_mouse: { type: "v2", value: new THREE.Vector2() }
+    };
 
-	// create geometry and color
-	geometry = new THREE.SphereBufferGeometry( 100, 20, 20 );
-	color = new THREE.Color( '#D34646' );
+    var material = new THREE.ShaderMaterial( {
+        uniforms: uniforms,
+        vertexShader: document.getElementById( 'vertexshader' ).textContent,
+        fragmentShader: document.getElementById( 'fragmentshader' ).textContent
+    } );
 
-	// create the sphere's shader material
-	var shaderMaterial = new THREE.ShaderMaterial({
-		vertexShader:   document.querySelector('#vertexshader').textContent,
-		fragmentShader: document.querySelector('#fragmentshader').textContent
-	});
+    var mesh = new THREE.Mesh( geometry, material );
+    scene.add( mesh );
 
-	// create a new mesh with sphere geometry 
-	var sphere = new THREE.Mesh( geometry, shaderMaterial);
+    renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio( window.devicePixelRatio );
 
-	// add the sphere and camera to the scene
-	scene.add(sphere);
-	scene.add(camera);
+    container.appendChild( renderer.domElement );
 
-	renderer.render(scene, camera);
+    onWindowResize();
+    window.addEventListener( 'resize', onWindowResize, false );
 
-	window.addEventListener( 'resize', onWindowResize, false );
+    document.onmousemove = function(e){
+      uniforms.u_mouse.value.x = e.pageX
+      uniforms.u_mouse.value.y = e.pageY
+    }
 }
 
-// animate the scene
+function onWindowResize( event ) {
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    uniforms.u_resolution.value.x = renderer.domElement.width;
+    uniforms.u_resolution.value.y = renderer.domElement.height;
+}
+
 function animate() {
-    requestAnimationFrame(animate);
-    renderer.render(scene, camera);
+    requestAnimationFrame( animate );
+    render();
 }
 
-function onWindowResize() {
-	camera.aspect = window.innerWidth / window.innerHeight;
-	camera.updateProjectionMatrix();
-	renderer.setSize( window.innerWidth, window.innerHeight );
+function render() {
+    uniforms.u_time.value += 0.05;
+    renderer.render( scene, camera );
 }
 
 
