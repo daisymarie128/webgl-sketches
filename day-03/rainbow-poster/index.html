@@ -70,32 +70,27 @@
       return c.z * mix( vec3(1.0), rgb, c.y);
   }
 
-  highp float random(vec2 co) {
-        highp float a = 12.9898;
-        highp float b = 78.233;
-        highp float c = 43758.5453;
-        highp float dt= dot(co.xy ,vec2(a,b));
-        highp float sn= mod(dt,3.14);
-        return fract(sin(sn) * c);
-    }
+  // didnt use it in the end
+  // highp float random(vec2 co) {
+  //       highp float a = 12.9898;
+  //       highp float b = 78.233;
+  //       highp float c = 43758.5453;
+  //       highp float dt= dot(co.xy ,vec2(a,b));
+  //       highp float sn= mod(dt,3.14);
+  //       return fract(sin(sn) * c);
+  //   }
 
   void main(){
       vec2 st = gl_FragCoord.xy/(u_resolution);
       vec3 color = vec3(0.0);
 
-
-
-      // Use polar coordinates instead of cartesian
+      // move center point along a diagonal axis
       vec2 toCenter = vec2(sin(u_time/100.0))-st;
       float angle = atan(toCenter.y,toCenter.x)+u_time;
-      // float radius = length(toCenter)*2.0;
-      float opposite = sin(radians(angle))+u_mouse.x/600.0;
+      float radius = sin(radians(angle))+u_mouse.x/600.0;
 
       // float spin = sin(angle * radius) * u_time;
-    
-      // Map the angle (-PI to PI) to the Hue (from 0 to 1)
-      // and the Saturation to the radius
-      color = sin(hsb2rgb(vec3((angle/TWO_PI)+5.0,opposite,1.0)));
+      color = sin(hsb2rgb(vec3((angle/TWO_PI)+5.0,radius,1.0)));
 
       gl_FragColor = vec4(color,1.0);
   }
