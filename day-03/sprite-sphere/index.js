@@ -20,7 +20,6 @@ function init() {
   var height = window.innerHeight;
   camera = new THREE.PerspectiveCamera( 60, width / height, 1, 2100 );
   camera.position.z = 1500;
-  cameraOrtho = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 1, 10 );
   scene = new THREE.Scene();
   sceneOrtho = new THREE.Scene();
   // create sprites
@@ -42,6 +41,8 @@ function init() {
     var z = Math.random() - 0.5;
 
     material = blackDotMaterial.clone();
+
+    // change this to make the dots hover a little bit
     material.map.offset.set( -0.5, -0.5 );
     material.map.repeat.set( 2, 2 );
 
@@ -75,11 +76,6 @@ function onWindowResize() {
   var height = window.innerHeight;
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
-  cameraOrtho.left = - width / 2;
-  cameraOrtho.right = width / 2;
-  cameraOrtho.top = height / 2;
-  cameraOrtho.bottom = - height / 2;
-  cameraOrtho.updateProjectionMatrix();
   renderer.setSize( window.innerWidth, window.innerHeight );
 }
 function animate() {
