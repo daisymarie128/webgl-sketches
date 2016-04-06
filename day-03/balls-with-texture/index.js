@@ -30,7 +30,7 @@ function init() {
     renderer.setSize( window.innerWidth, window.innerHeight );
 
     color = new THREE.Color( 0xff0000 );
-    geometry = new THREE.SphereGeometry( 200, 200, 200 );
+    geometry = new THREE.SphereGeometry( 200, 30, 30 );
 
     var texture = new THREE.TextureLoader().load( "water-texture.jpg" );
     // gets rid of the obvious cuts and edges of texture
