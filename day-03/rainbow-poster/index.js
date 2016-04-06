@@ -16,7 +16,7 @@ animate();
 
 function init() {
 	
-    container = document.getElementById( 'container' );
+    container = document.getElementById('canvas-container');
     camera = new THREE.Camera();
     camera.position.z = 1;
     scene = new THREE.Scene();

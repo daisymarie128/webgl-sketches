@@ -5,11 +5,22 @@
     <title>Hello World</title>
     <meta name="description" content="hello world for shader">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel=stylesheet href="main.css">
   </head>
   <body>
-
-    <p>Hellow world shader</p>
-    <div id="container"></div>
+    
+    <div id="main-container">
+      <div id="text-container">
+        <div class="text-wrapper">
+          <h1>20.4.2016</h1>
+          <h1>creative coding</h1>
+          <h2>Charlie Gerard</h2>
+          <h2>Daisy Smith</h2>
+          <p>this is what we're talking about</p>
+        </div>
+      </div>
+    </div>
+    <div id="canvas-container"></div>
     
     <!-- Shaders -->
   <script type="x-shader/x-vertex" id="vertexshader">
@@ -78,7 +89,7 @@
       vec2 toCenter = vec2(sin(u_time/100.0))-st;
       float angle = atan(toCenter.y,toCenter.x)+u_time;
       // float radius = length(toCenter)*2.0;
-      float opposite = sin(radians(angle))+u_mouse.x/1000.0;
+      float opposite = sin(radians(angle))+u_mouse.x/600.0;
 
       // float spin = sin(angle * radius) * u_time;
     
