@@ -17,12 +17,13 @@ animate();
 function init() {
 	
     container = document.getElementById( 'container' );
-    camera = new THREE.Camera();
-    camera.position.z = 1;
+    camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 3000 );
+    camera.position.z = 4;
     scene = new THREE.Scene();
 
     // var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
-    var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+    // var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+    var geometry = new THREE.BoxGeometry( 0.75, 0.75, 0.75 );
 
 
     uniforms = {
