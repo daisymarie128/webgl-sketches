@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Hello World</title>
+    <meta name="description" content="hello world for shader">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+
+    <p>Hellow world shader</p>
+    <div id="container"></div>
+    
+    <!-- Shaders -->
+  <script type="x-shader/x-vertex" id="vertexshader">
+
+    // switch on high precision floats
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+    uniform sampler2D bumpTexture; // defined in heightmap.js
+
+    uniform float u_time;
+    uniform vec2 u_resolution;
+    varying float vAmount;
+    varying vec2 vUV;
+    varying float time;
+    varying float vRotation;
+
+    // didnt use it in the end
+    highp float random(vec2 co)
+    {
+        highp float a = 12.9898;
+        highp float b = 78.233;
+        highp float c = 43758.5453;
+        highp float dt= dot(co.xy ,vec2(a,b));
+        highp float sn= mod(dt,3.14);
+        return fract(sin(sn) * c);
+    }
+
+    void main(){
+      float scaleAmt = 2.8;
+      vUV = uv;
+      vec4 bumpData = texture2D( bumpTexture, vUV );
+      vec2 st = position.xy/(u_resolution);
+
+      vec2 toCenter = vec2(sin(u_time/100.0))-st;
+      float angle = atan(toCenter.y,toCenter.x)+u_time;
+      float radius = sin(radians(angle)) / u_time;
+
+      // vAmount will be within [0.0, 300.0] with water level being 100.0
+      // vAmount = dot(bumpData, vec4(random(vec2(300.0, 600.0)), random(vec2(20.0, 900.0)), random(vec2(100.0, 300.0)), 1));
+      vAmount = dot(bumpData, vec4(random(vec2(300.0, 600.0)), random(vec2(20.0, 900.0)), random(vec2(100.0, 300.0)), 1));
+      vec3 newPosition = position + normal * scaleAmt * cos(u_time * position*radius);
+
+      vRotation = radius;
+      time = u_time;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position + normal * scaleAmt * vAmount, 1.0);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+    }
+
+  </script>
+
+  <script type="x-shader/x-fragment" id="fragmentshader">
+
+  // quick hello world
+  // practice using the mouse position and effecting colors.
+
+  #ifdef GL_ES
+  precision mediump float;
+  #endif
+
+  #define TWO_PI 6.28318530718
+
+  varying float vAmount;
+  varying vec2 vUV;
+  varying float time;
+  varying float vRotation;
+  uniform sampler2D colorMap;
+
+  highp float random(vec2 co)
+    {
+        highp float a = 12.9898;
+        highp float b = 78.233;
+        highp float c = 43758.5453;
+        highp float dt= dot(co.xy ,vec2(a,b));
+        highp float sn= mod(dt,3.14);
+        return fract(sin(sn) * c);
+    }
+
+  void main() {
+    vec4 color;
+    float angle = atan(gl_FragCoord.y,gl_FragCoord.x)+time;
+
+      float amt = vAmount;
+      vec4 colorData = texture2D( colorMap, vUV+(time/1000.0));
+      // color = sin(hsb2rgb(vec3((angle/TWO_PI)+5.0,radius,1.0)));
+      color = vec4(mix(colorData.r, 1.0, .5), mix(colorData.g, 1.0, .5), mix(colorData.b, 1.0, .5), 1.0);
+      // color = vec4(vec3(sin(time),colorData.r,colorData.g), 1.0);
+
+    gl_FragColor = color;
+  }
+
+
+  </script>
+
+  <!-- End Shaders -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.js"></script>
+  <script src="index.js"></script>
+  </body>
+</html>
