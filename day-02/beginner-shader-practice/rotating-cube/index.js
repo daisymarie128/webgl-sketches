@@ -22,7 +22,6 @@ function init() {
     scene = new THREE.Scene();
 
     // var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
-    // var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
     var geometry = new THREE.BoxGeometry( 0.75, 0.75, 0.75 );
 
 

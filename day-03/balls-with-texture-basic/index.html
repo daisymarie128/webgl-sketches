@@ -2,12 +2,13 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Experimenting with textures</title>
+    <title>Hello World</title>
     <meta name="description" content="hello world for shader">
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
 
+    <p>Hellow world shader</p>
     <div id="container"></div>
     
     <!-- Shaders -->
@@ -34,21 +35,14 @@
   precision mediump float;
   #endif
 
-  varying float vAmount;
-  varying vec2 vUV;
-  uniform sampler2D colorMap;
+  uniform vec2 u_resolution;
+  uniform vec2 u_mouse;
+  uniform float u_time;
 
   void main() {
-    vec4 color;
-    if (vAmount < 100.0) {
-      color = vec4(0.0, 0.0, vAmount / 400.0, 1.0);
-    } else {
-      float amt = vAmount / 300.0;
-      vec4 colorData = texture2D( colorMap, vUV );
-      color = vec4(mix(colorData.r, amt, .5), mix(colorData.g, amt, .5), mix(colorData.b, amt, .5), 1.0);
-    }
-
-    gl_FragColor = color;
+    vec2 st = gl_FragCoord.xy/u_resolution;
+    vec2 ms = 2.0*sin(u_mouse/u_resolution);
+    gl_FragColor = vec4(ms.x,ms.y,st.x,1.0);
   }
 
 

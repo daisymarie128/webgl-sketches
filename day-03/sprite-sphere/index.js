@@ -43,7 +43,7 @@ function init() {
     material = blackDotMaterial.clone();
 
     // change this to make the dots hover a little bit
-    material.map.offset.set( -0.5, -0.5 );
+    // material.map.offset.set( -0.1, -0.1 );
     material.map.repeat.set( 2, 2 );
 
     var sprite = new THREE.Sprite( material );
@@ -55,7 +55,7 @@ function init() {
 
     // times by the length by the radius
     // creates the sphere looking effect
-    sprite.position.multiplyScalar( radius * 1.0 );
+    sprite.position.multiplyScalar( radius );
     group.add( sprite );
   }
   scene.add( group );
@@ -81,19 +81,14 @@ function onWindowResize() {
 function animate() {
   var time = Date.now() / 1000;
 
-  // loop through all the sprites
-  for ( var i = 0, l = group.children.length; i < l; i ++ ) {
+  // loop through all the sprites in the object
+  for ( var i = 0; i < group.children.length; i ++ ) {
     var random = Math.random();
-    var sprite = group.children[ i ];
-    var scale = Math.sin( sprite.position.z / 100);
-    var imageWidth = 105;
-    var imageHeight = 105;
+    var sprite = group.children[i];
+    var scale = Math.sin( sprite.position.z / 10);
+    var imageWidth = 80;
+    var imageHeight = 80;
 
-    // if ( material.map && material.map.image && material.map.image.width ) {
-    //   // imageWidth = material.map.image.width;
-    //   // imageHeight = material.map.image.height;
-    // }
-    sprite.material.rotation += 0.1 * ( i / l );
     sprite.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
     sprite.material.opacity = Math.sin( time + sprite.position.x * 0.01 ) * 0.4 + 0.6;
   }

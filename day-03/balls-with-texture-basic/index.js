@@ -29,11 +29,16 @@ function init() {
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
 
-    color = new THREE.Color('#fff');
-    geometry = new THREE.SphereGeometry( 200, 10, 10 );
-    material = new THREE.MeshBasicMaterial( { color: color } );
+    color = new THREE.Color( 0xff0000 );
+    geometry = new THREE.SphereGeometry( 200, 30, 30 );
 
-    material.wireframe = true;
+    var texture = new THREE.TextureLoader().load( "water-texture.jpg" );
+    
+    // gets rid of the obvious cuts and edges of texture
+    texture.wrapS = THREE.MirroredRepeatWrapping;
+    texture.wrapT = THREE.MirroredRepeatWrapping;
+    texture.repeat.set( 5, 5 );
+    material = new THREE.MeshBasicMaterial( { map: texture } );
 
     sphere = new THREE.Mesh( geometry, material );
     scene.add( sphere );
