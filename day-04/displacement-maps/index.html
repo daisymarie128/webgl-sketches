@@ -40,6 +40,7 @@
       vUV = uv;
       vec4 bumpData = texture2D( bumpTexture, vUV );
 
+      //test
       // vAmount will be within [0.0, 300.0] with water level being 100.0
       // vAmount = dot(bumpData, vec4(random(vec2(300.0, 600.0)), random(vec2(20.0, 900.0)), random(vec2(100.0, 300.0)), 1));
       vAmount = dot(bumpData, vec4(random(vec2(300.0, 600.0)), random(vec2(20.0, 900.0)), random(vec2(100.0, 300.0)), 1));
