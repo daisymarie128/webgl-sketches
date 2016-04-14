@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Glitchy</title>
+    <meta name="description" content="hello world for shader">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+
+    <div id="container"></div>
+    
+    <!-- Shaders -->
+  <script type="x-shader/x-vertex" id="vertexshader">
+
+    // // switch on high precision floats
+    // #ifdef GL_ES
+    // precision highp float;
+    // #endif
+    uniform sampler2D bumpTexture; // defined in heightmap.js
+
+    uniform float u_time;
+    uniform vec2 u_resolution;
+    varying float vAmount;
+    varying vec2 vUV;
+    varying float time;
+    varying float vRotation;
+    // varying vec2 vN;
+
+    varying vec3 e;
+    varying vec3 n;
+
+    highp float random(vec2 co) {
+        highp float a = 12.9898;
+        highp float b = 78.233;
+        highp float c = 43758.5453;
+        highp float dt= dot(co.xy ,vec2(a,b));
+        highp float sn= mod(dt,3.14);
+        return fract(sin(sn) * c);
+    }
+
+    void main() {
+      float scaleAmt = 2.8;
+      vUV = uv;
+      vec4 bumpData = texture2D( bumpTexture, vUV );
+      vec2 st = position.xy/(u_resolution);
+
+      vec2 toCenter = vec2(sin(u_time/100.0))-st;
+      float angle = atan(toCenter.y,toCenter.x)+u_time;
+      float radius = sin(radians(angle)) / u_time;
+
+      // displacement
+      vAmount = dot(bumpData, vec4(random(vec2(300.0, 600.0)), random(vec2(20.0, 900.0)), random(vec2(100.0, 300.0)), 1));
+      vec3 newPosition = position + normal * scaleAmt * cos(u_time * position*radius);
+
+      vRotation = radius;
+      time = u_time;
+
+      // used for the fragment
+      e = normalize( vec3( modelViewMatrix * vec4( position, 1.0 ) ) );
+      n = normalize( normalMatrix * normal );
+
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position/1.0*sin(angle/vAmount), 1. );
+    }
+
+  </script>
+
+  <script type="x-shader/x-fragment" id="fragmentshader">
+
+  uniform sampler2D colorMap;
+
+  varying vec3 e;
+  varying vec3 n;
+  varying float time;
+  void main() {
+      
+      vec3 r = reflect( e, n/time);
+      // vec3 r = reflect( vec3(1.0, 2.0, 3.0), vec3(3.0, 4.0, 5.0) );
+      float m = 2. * sqrt( pow( r.x, 2. ) + pow( r.y, 2. ) + pow( r.z + 1., 2. ) );
+      vec2 vN = r.xy / m + .5;
+
+      vec3 base = texture2D( colorMap, vN ).rgb;
+
+      gl_FragColor = vec4( base, 1. );
+
+  }
+
+
+  </script>
+
+  <!-- End Shaders -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.js"></script>
+  <script src="OBJLoader.js"></script>
+  <script src="postshaders/CopyShader.js"></script>
+  <script src="postshaders/DigitalGlitch.js"></script>
+  <script src="postshaders/DotShader.js"></script>
+  <script src="postshaders/RGBShiftShader.js"></script>
+
+  <script src="postprocessing/EffectComposer.js"></script>
+  <script src="postprocessing/RenderPass.js"></script>
+  <script src="postprocessing/MaskPass.js"></script>
+  <script src="postprocessing/ShaderPass.js"></script>
+  <script src="postprocessing/GlitchPass.js"></script>
+  <script src="index.js"></script>
+  </body>
+</html>
