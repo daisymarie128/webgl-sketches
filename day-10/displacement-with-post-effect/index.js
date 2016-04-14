@@ -81,7 +81,6 @@ function init() {
     renderer.setSize( window.innerWidth, window.innerHeight );
 
     object = new THREE.Object3D();
-    scene.add( object );
 
     // this is the amount of spheres we want
     color = new THREE.Color( 0xff0000 );
@@ -103,7 +102,8 @@ function init() {
     // bumpTexture = new THREE.TextureLoader().load( "clay.jpg" );
     // colorTexture = new THREE.TextureLoader().load( "clay.jpg" );
     // colorTexture = new THREE.TextureLoader().load( "white-corss-hatch.jpg" );
-    colorTexture = new THREE.TextureLoader().load( "matcap-black-blue.png" );
+    // colorTexture = new THREE.TextureLoader().load( "rainbow.jpg" );
+    colorTexture = new THREE.TextureLoader().load( "matcap-pink.jpg" );
     // colorTexture = new THREE.TextureLoader().load( "black-wash.jpg" );
     // colorTexture = new THREE.TextureLoader().load( "black-bump.png" );
     // bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping;
@@ -147,13 +147,23 @@ function init() {
         scene.add( clone );
     };
 
-    renderer.setClearColor(0xffffff, 1);
+    // renderer.setClearColor(0xffffff, 1);
+
 
     composer = new THREE.EffectComposer( renderer );
     composer.addPass( new THREE.RenderPass( scene, camera ) );
     glitchPass = new THREE.GlitchPass();
     glitchPass.renderToScreen = true;
     composer.addPass( glitchPass );
+
+    // var effect = new THREE.ShaderPass( THREE.DotScreenShader );
+    //     effect.uniforms[ 'scale' ].value = 4;
+    //     composer.addPass( effect );
+
+    // var effect = new THREE.ShaderPass( THREE.RGBShiftShader );
+    //     effect.uniforms[ 'amount' ].value = 0.0015;
+    //     effect.renderToScreen = true;
+    //     composer.addPass( effect );
 
     document.body.appendChild( renderer.domElement );
 }
