@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Glitchy</title>
+    <meta name="description" content="hello world for shader">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+
+    <div id="container"></div>
+    
+    <!-- Shaders -->
+  <script type="x-shader/x-vertex" id="vertexshader">
+
+    // // switch on high precision floats
+    // #ifdef GL_ES
+    // precision highp float;
+    // #endif
+    // uniform sampler2D bumpTexture; // defined in heightmap.js
+
+    uniform float u_time;
+    // uniform vec2 u_resolution;
+    // varying float vAmount;
+    // varying vec2 vUV;
+    // varying float time;
+    // varying float vRotation;
+    // // varying vec2 vN;
+
+    // varying vec3 e;
+    // varying vec3 n;
+
+    // highp float random(vec2 co) {
+    //     highp float a = 12.9898;
+    //     highp float b = 78.233;
+    //     highp float c = 43758.5453;
+    //     highp float dt= dot(co.xy ,vec2(a,b));
+    //     highp float sn= mod(dt,3.14);
+    //     return fract(sin(sn) * c);
+    // }
+
+    // void main() {
+    //   float scaleAmt = 2.8;
+    //   vUV = uv;
+    //   vec4 bumpData = texture2D( bumpTexture, vUV );
+    //   vec2 st = position.xy/(u_resolution);
+
+    //   vec2 toCenter = vec2(sin(u_time/100.0))-st;
+    //   float angle = atan(toCenter.y,toCenter.x)+u_time;
+    //   float radius = sin(radians(angle)) / u_time;
+
+
+    //   // vN = r.xy / m + .5;/
+
+    //   // vAmount will be within [0.0, 300.0] with water level being 100.0
+    //   // vAmount = dot(bumpData, vec4(random(vec2(300.0, 600.0)), random(vec2(20.0, 900.0)), random(vec2(100.0, 300.0)), 1));
+    //   // vAmount = dot(bumpData, vec4(random(vec2(300.0, 600.0)), random(vec2(20.0, 900.0)), random(vec2(100.0, 300.0)), 1));
+    //   vAmount = dot(bumpData, vec4(random(vec2(300.0, 600.0)), random(vec2(20.0, 900.0)), random(vec2(100.0, 300.0)), 1));
+    //   vec3 newPosition = position + normal * scaleAmt * cos(u_time * position*radius);
+
+    //   vRotation = radius;
+    //   time = u_time;
+    //   // gl_Position = projectionMatrix * modelViewMatrix * vec4(position + normal * scaleAmt * vAmount, 1.0);
+    //   // gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+
+    //   e = normalize( vec3( modelViewMatrix * vec4( position, 1.0 ) ) );
+    //   n = normalize( normalMatrix * normal );
+
+    //   gl_Position = projectionMatrix * modelViewMatrix * vec4( position/1.0*sin(angle/(vAmount*10.0)), 1. );
+    // }
+
+    uniform sampler2D noiseTexture;
+    uniform float noiseScale;
+
+    uniform sampler2D bumpTexture;
+    uniform float bumpSpeed;
+    uniform float bumpScale;
+
+    uniform float time;
+
+    varying vec2 vUv;
+
+    void main()
+    {
+        vUv = uv;
+
+        vec2 uvTimeShift = vUv + vec2( 1.1, 1.9 ) * time * bumpSpeed;
+        vec4 noise = texture2D( noiseTexture, uvTimeShift );
+        vec2 uvNoiseTimeShift = vUv + noiseScale * vec2( noise.r, noise.g );
+        // below, using uvTimeShift seems to result in more of a "rippling" effect
+        //   while uvNoiseTimeShift seems to result in more of a "shivering" effect
+        vec4 bumpData = texture2D( bumpTexture, uvTimeShift );
+
+        // move the position along the normal
+        //  but displace the vertices at the poles by the same amount
+        float displacement = ( vUv.y > 0.999 || vUv.y < 0.001 ) ?
+        bumpScale * (0.3 + 0.02 * sin(time)) :
+        bumpScale * bumpData.r;
+        vec3 newPosition = position + normal * displacement;
+
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+    }
+  </script>
+
+  <script type="x-shader/x-fragment" id="fragmentshader">
+
+  // // quick hello world
+  // // practice using the mouse position and effecting colors.
+
+  // #ifdef GL_ES
+  // precision mediump float;
+  // #endif
+
+  // #define TWO_PI 6.28318530718
+
+  // varying float vAmount;
+  // varying vec2 vUV;
+  // varying float time;
+  // varying float vRotation;
+  // uniform sampler2D colorMap;
+  // varying vec3 TexCoord0;
+
+  // highp float random(vec2 co)
+  //   {
+  //       highp float a = 12.9898;
+  //       highp float b = 78.233;
+  //       highp float c = 43758.5453;
+  //       highp float dt= dot(co.xy ,vec2(a,b));
+  //       highp float sn= mod(dt,3.14);
+  //       return fract(sin(sn) * c);
+  //   }
+
+  // void main() {
+  //   vec4 color;
+  //   float angle = atan(gl_FragCoord.y,gl_FragCoord.x)+time;
+  //   vec4 colorData = texture2D( colorMap, vUV+(time/1000.0));
+  //   vec4 texel = textureCube(colorData, TexCoord0);
+
+  //     float amt = vAmount;
+  //     // color = sin(hsb2rgb(vec3((angle/TWO_PI)+5.0,radius,1.0)));
+  //     color = vec4(mix(colorData.r, 1.0, .5), mix(colorData.g, 1.0, .5), mix(colorData.b, 1.0, random(vec2(0.0, 1.0))), 1.0);
+  //     // color = vec4(vec3(sin(time),colorData.r,colorData.g), 1.0);
+
+  //   gl_FragColor = vec4 texel = textureCube(Texture0, TexCoord0);;
+  //   // gl_FragColor = color;
+  // }
+  // uniform sampler2D colorMap;
+
+  // varying vec3 e;
+  // varying vec3 n;
+
+  // void main() {
+      
+  //     vec3 r = reflect( e, n );
+  //     float m = 2. * sqrt( pow( r.x, 2. ) + pow( r.y, 2. ) + pow( r.z + 1., 2. ) );
+  //     vec2 vN = r.xy / m + .5;
+
+  //     vec3 base = texture2D( colorMap, vN ).rgb;
+
+  //     gl_FragColor = vec4( base, 1. );
+
+  // }
+
+uniform sampler2D baseTexture;
+uniform float baseSpeed;
+uniform float repeatS;
+uniform float repeatT;
+
+uniform sampler2D noiseTexture;
+uniform float noiseScale;
+
+uniform sampler2D blendTexture;
+uniform float blendSpeed;
+uniform float blendOffset;
+
+uniform float time;
+uniform float alpha;
+
+varying vec2 vUv;
+
+void main()
+{
+    vec2 uvTimeShift = vUv + vec2( -0.7, 1.5 ) * time * baseSpeed;
+    vec4 noise = texture2D( noiseTexture, uvTimeShift );
+    vec2 uvNoiseTimeShift = vUv + noiseScale * vec2( noise.r, noise.b );
+    vec4 baseColor = texture2D( baseTexture, uvNoiseTimeShift * vec2(repeatS, repeatT) );
+
+    vec2 uvTimeShift2 = vUv + vec2( 1.3, -1.7 ) * time * blendSpeed;
+    vec4 noise2 = texture2D( noiseTexture, uvTimeShift2 );
+    vec2 uvNoiseTimeShift2 = vUv + noiseScale * vec2( noise2.g, noise2.b );
+    vec4 blendColor = texture2D( blendTexture, uvNoiseTimeShift2 * vec2(repeatS, repeatT) ) - blendOffset * vec4(1.0, 1.0, 1.0, 1.0);
+
+    vec4 theColor = baseColor + blendColor;
+    theColor.a = alpha;
+    gl_FragColor = theColor;
+}
+
+  </script>
+
+  <!-- End Shaders -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.js"></script>
+  <script src="postshaders/CopyShader.js"></script>
+  <script src="postshaders/DigitalGlitch.js"></script>
+
+  <script src="postprocessing/EffectComposer.js"></script>
+  <script src="postprocessing/RenderPass.js"></script>
+  <script src="postprocessing/MaskPass.js"></script>
+  <script src="postprocessing/ShaderPass.js"></script>
+  <script src="postprocessing/GlitchPass.js"></script>
+  <script src="index.js"></script>
+  </body>
+</html>

@@ -107,17 +107,19 @@ function init() {
 
     sphere = new THREE.Mesh( geometry, material );
 
-    for (var i = 0; i < cooordinates.length; i++) {
+    // for (var i = 0; i < cooordinates.length; i++) {
 
-        var clone = sphere.clone();
-        clone.position.x = cooordinates[i].x;
-        clone.position.y = cooordinates[i].y;
-        clone.position.z = cooordinates[i].z;
-        var scale = clone.position.z / 50 * 2.0;
-        clone.scale.set( scale, scale, scale );
+    //     var clone = sphere.clone();
+    //     clone.position.x = cooordinates[i].x;
+    //     clone.position.y = cooordinates[i].y;
+    //     clone.position.z = cooordinates[i].z;
+    //     var scale = clone.position.z / 50 * 2.0;
+    //     clone.scale.set( scale, scale, scale );
 
-        scene.add( clone );
-    };
+    //     scene.add( clone );
+    // };
+
+    scene.add( sphere );
 
     renderer.setClearColor(0xffffff, 1);
     document.body.appendChild( renderer.domElement );

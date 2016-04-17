@@ -103,7 +103,7 @@ function init() {
     // colorTexture = new THREE.TextureLoader().load( "clay.jpg" );
     // colorTexture = new THREE.TextureLoader().load( "white-corss-hatch.jpg" );
     // colorTexture = new THREE.TextureLoader().load( "rainbow.jpg" );
-    colorTexture = new THREE.TextureLoader().load( "matcap-pink.jpg" );
+    colorTexture = new THREE.TextureLoader().load( "matcap-bluey-green.jpg" );
     // colorTexture = new THREE.TextureLoader().load( "black-wash.jpg" );
     // colorTexture = new THREE.TextureLoader().load( "black-bump.png" );
     // bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping;
