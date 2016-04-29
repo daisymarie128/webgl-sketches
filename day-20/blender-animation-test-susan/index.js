@@ -4,7 +4,11 @@
 
   GETTING STARTED WITH IMPORTING BLENDER MODELS
   PLUS IMPORTING ANIMATIONS
-
+    
+    Notes for animating in blender:
+    ** Get this https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender
+      *** Install it for blender and export your oject with your animations using that.
+    ** Animate using shape keys
 
 ------------------------------------------------*/
 
@@ -75,7 +79,7 @@ function init() {
 
       unlike the last model now we are using the
       material exported from blender 
-      
+
       ---------------*/
     var material = materials[ 0 ];
     materials[0].morphTargets = true;
