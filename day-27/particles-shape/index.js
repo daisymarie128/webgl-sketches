@@ -3,149 +3,183 @@
 /* ---------------
 
   Experimenting with making a mesh out of particles.
+  // re write of http://threejs.org/examples/#webgl_buffergeometry_constructed_from_geometry
 
 ---------------*/
 
 
-var renderer, scene, camera, stats;
+var container,
+    controls,
+    camera,
+    scene,
+    renderer;
 
-      var particles, uniforms;
+init();
+animate();
 
-      var PARTICLE_SIZE = 50;
+function init() {
+    
+    // set up our basic scene
+    container = document.getElementById('container');
+    camera = new THREE.PerspectiveCamera(45.0, window.innerWidth / window.innerHeight, 100, 1500.0);
+    camera.position.z = 980.0;
+    scene = new THREE.Scene();
+    renderer = new THREE.WebGLRenderer({
+      antialias: true
+    });
+    renderer.setClearColor(0x000000, 0.0);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
 
-      var raycaster, intersects;
-      var mouse, INTERSECTED;
+    // create some lights
+    var light1 = new THREE.DirectionalLight(0x999999, 0.1);
+    light1.position.set(1, 1, 1);
+    var light2 = new THREE.DirectionalLight(0x999999, 1.5);
+    light2.position.set(0, -1, 0);
+    scene.add(new THREE.AmbientLight(0x444444));
+    scene.add(light1);
+    scene.add(light2);
 
-      init();
-      animate();
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.25;
+    controls.enableZoom = false;
 
-      function init() {
+    window.addEventListener('resize', onWindowResize, false);
+    createScene();
 
-        container = document.getElementById( 'container' );
+}
 
-        scene = new THREE.Scene();
+function createScene() {
 
-        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-        camera.position.z = 30;
+var bufferGeometry,
+    radius,
+    positions,
+    normals,
+    colors,
+    subDivisions,
+    height,
+    phi,
+    theta;
 
-        //
-
-        var geometry1 = new THREE.SphereGeometry( 10, 10, 10 );
-        var vertices = geometry1.vertices;
-
-        var positions = new Float32Array( vertices.length * 3 );
-        var colors = new Float32Array( vertices.length  * 3);
-        var sizes = new Float32Array( vertices.length );
-
-        var vertex;
-        var color = new THREE.Color();
-
-        for ( var i = 0, l = vertices.length; i < l; i ++ ) {
-
-          vertex = vertices[ i ];
-          vertex.toArray( positions, i * 3 );
-
-          // color.setHSL( 0.01 + 0.1 * ( i / l ), 1.0, 0.5 )
-          color.toArray( colors, i * 3 );
-
-          sizes[ i ] = PARTICLE_SIZE * 0.05;
-
-        }
-
-        var geometry = new THREE.BufferGeometry();
-        geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-        geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
-        geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
-
-        //
-
-        var material = new THREE.ShaderMaterial( {
-
-          uniforms: {
-            color:   { type: "c", value: new THREE.Color( 0xffffff ) },
-            texture: { type: "t", value: new THREE.TextureLoader().load( "pink-stripe-ball.png" ) }
-          },
-          vertexShader: document.getElementById( 'vertexshader' ).textContent,
-          fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
-
-          alphaTest: 0.9,
-          wireframe: true,
-
-        } );
+  // create our container shape/geometry
+  // then define some of our values we will use later
+  bufferGeometry = new THREE.BufferGeometry();
+  radius = 200;
+  positions = 0;
+  normals = 0;
+  colors = 0;
+  subDivisions = 80;
+  height = 70;
 
 
-        // material.uniforms.texture.value.wrapS = THREE.ClampToEdgeWrapping;
-        // material.uniforms.texture.value.wrapT = THREE.ClampToEdgeWrapping;
-        //
+  for (var i = 0; i < subDivisions / 2; i++) {
 
-        particles = new THREE.Points( geometry, material );
-        scene.add( particles );
+    // find latitude positions for sphere
+    var leftSide = (i + 0) * 180 / (subDivisions / 2);
+    var rightSide = (i + 1) * 180 / (subDivisions / 2);
+    var lat = (leftSide + rightSide) / 2.0;
 
-        //
+    for (var j = 0; j < subDivisions; j++) {
 
-        renderer = new THREE.WebGLRenderer();
-        renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( window.innerWidth, window.innerHeight );
-        container.appendChild( renderer.domElement );
+      // find longitude positions for sphere
+      var leftSide = (j + 0) * 360 / subDivisions;
+      var rightSide = (j + 1) * 360 / subDivisions;
+      var lng = (leftSide + rightSide) / 2.0;
 
-        //
+      // math to calculate where to move the points around a sphere
+      phi = lat * Math.PI / 180.0;
+      theta = lng * Math.PI / 180.0;
+      var x = radius * Math.sin(phi) * Math.cos(theta);
+      var y = radius * Math.cos(phi);
+      var z = radius * Math.sin(phi) * Math.sin(theta);
 
-        raycaster = new THREE.Raycaster();
-        mouse = new THREE.Vector2();
+      // create our geometry
+      // and then move it using our calculations
+      var ball = new THREE.SphereGeometry(5, 10, 10);;
+      ball.translate(0, height / 2, 0);
+      ball.rotateX(-Math.PI / 2);
+      ball.lookAt(new THREE.Vector3(-x, -y, -z));
+      ball.translate(x, y, z);
+      var color = new THREE.Color(0xffffff);
+      color.setHSL(lat / 180.0, 1.0, 0.7);
 
-        //
-
-        // stats = new Stats();
-        // container.appendChild( stats.dom );
-
-        //
-
-        window.addEventListener( 'resize', onWindowResize, false );
-        document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
+      if (positions === 0) {
+        var divisions = subDivisions * subDivisions / 2;
+        positions = new Float32Array(divisions * ball.faces.length * 3 * 3);
+        normals = new Float32Array(divisions * ball.faces.length * 3 * 3);
+        colors = new Float32Array(divisions * ball.faces.length * 3 * 3);
       }
 
-      function onDocumentMouseMove( event ) {
+      // push balls to the right place
+      ball.faces.forEach(function (face, index) {
 
-        event.preventDefault();
+        var curElement = ((j + i * subDivisions) * ball.faces.length + index);
 
-        // mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        // mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+        // getting confused about this part.
+        // why the number 9 is being used.
+        positions[ curElement * 9 + 0 ] = ball.vertices[ face.a ].x;
+        positions[ curElement * 9 + 1 ] = ball.vertices[ face.a ].y;
+        positions[ curElement * 9 + 2 ] = ball.vertices[ face.a ].z;
+        positions[ curElement * 9 + 3 ] = ball.vertices[ face.b ].x;
+        positions[ curElement * 9 + 4 ] = ball.vertices[ face.b ].y;
+        positions[ curElement * 9 + 5 ] = ball.vertices[ face.b ].z;
+        positions[ curElement * 9 + 6 ] = ball.vertices[ face.c ].x;
+        positions[ curElement * 9 + 7 ] = ball.vertices[ face.c ].y;
+        positions[ curElement * 9 + 8 ] = ball.vertices[ face.c ].z;
 
-      }
+        normals[ curElement * 9 + 0 ] = face.normal.x;
+        normals[ curElement * 9 + 1 ] = face.normal.y;
+        normals[ curElement * 9 + 2 ] = face.normal.z;
+        normals[ curElement * 9 + 3 ] = face.normal.x;
+        normals[ curElement * 9 + 4 ] = face.normal.y;
+        normals[ curElement * 9 + 5 ] = face.normal.z;
+        normals[ curElement * 9 + 6 ] = face.normal.x;
+        normals[ curElement * 9 + 7 ] = face.normal.y;
+        normals[ curElement * 9 + 8 ] = face.normal.z;
 
-      function onWindowResize() {
+        colors[ curElement * 9 + 0 ] = color.r;
+        colors[ curElement * 9 + 1 ] = color.g;
+        colors[ curElement * 9 + 2 ] = color.b;
+        colors[ curElement * 9 + 3 ] = color.r;
+        colors[ curElement * 9 + 4 ] = color.g;
+        colors[ curElement * 9 + 5 ] = color.b;
+        colors[ curElement * 9 + 6 ] = color.r;
+        colors[ curElement * 9 + 7 ] = color.g;
+        colors[ curElement * 9 + 8 ] = color.b;
+      });
+     }
+    }
+    bufferGeometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+    bufferGeometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
+    bufferGeometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+    bufferGeometry.computeBoundingSphere();
 
-        renderer.setSize( window.innerWidth, window.innerHeight );
+    var bufferMaterial = new THREE.MeshPhongMaterial({
+      color: 0xffffff,
+      shininess: 50,
+      side: THREE.DoubleSide,
+      vertexColors: THREE.VertexColors,
+      shading: THREE.SmoothShading
+    });
 
-      }
+    var bufferMesh = new THREE.Mesh(bufferGeometry, bufferMaterial);
+    scene.add(bufferMesh);
 
-      function animate() {
+}
 
-        requestAnimationFrame( animate );
+function onWindowResize(event) {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
 
-        render();
-        // stats.update();
+function animate() {
+  controls.update();
+  requestAnimationFrame(animate);
+  render();
+}
 
-      }
-
-      function render() {
-
-        particles.rotation.x += 0.0005;
-        particles.rotation.y += 0.001;
-
-        var geometry = particles.geometry;
-        var attributes = geometry.attributes;
-
-        raycaster.setFromCamera( mouse, camera );
-
-        intersects = raycaster.intersectObject( particles );
-
-
-        renderer.render( scene, camera );
-
-      }
-
+function render() {
+  renderer.render(scene, camera);
+}
