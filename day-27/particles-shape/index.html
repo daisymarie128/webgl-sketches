@@ -14,13 +14,13 @@
     <!-- Shaders -->
   <script type="x-shader/x-vertex" id="vertexshader">
       attribute float size;
-      attribute vec3 ca;
+      attribute vec3 customColor;
 
       varying vec3 vColor;
 
       void main() {
 
-        vColor = ca;
+        vColor = customColor;
 
         vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
@@ -40,9 +40,11 @@
 
       void main() {
 
-        vec4 color = vec4( color * vColor, 1.0 ) * texture2D( texture, gl_PointCoord );
+        gl_FragColor = vec4( color * vColor, 1.0 );
 
-        gl_FragColor = color;
+        gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+
+        if ( gl_FragColor.a < ALPHATEST ) discard;
 
       }
   </script>
