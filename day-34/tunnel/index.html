@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Hello World</title>
+    <meta name="description" content="hello world for shader">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+
+    <p>Hellow world shader</p>
+    <div id="container"></div>
+    
+    <!-- Shaders -->
+  <script type="x-shader/x-vertex" id="vertexshader">
+
+    // switch on high precision floats
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
+    void main()
+    {
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+    }
+
+  </script>
+
+  <script type="x-shader/x-fragment" id="fragmentshader">
+
+  // quick hello world
+  // practice using the mouse position and effecting colors.
+
+  #ifdef GL_ES
+  precision mediump float;
+  #endif
+
+  uniform vec2 u_resolution;
+  uniform vec2 u_mouse;
+  uniform float u_time;
+
+  void main() {
+    vec2 st = gl_FragCoord.xy/u_resolution;
+    vec2 ms = 2.0*sin(u_mouse/u_resolution);
+    gl_FragColor = vec4(ms.x,ms.y,st.x,1.0);
+  }
+
+
+  </script>
+
+  <!-- End Shaders -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.js"></script>
+  <script src="../../../libs/postshaders/CopyShader.js"></script>
+  <script src="../../../libs/postshaders/DigitalGlitch.js"></script>
+  <script src="../../../libs/postshaders/DotShader.js"></script>
+  <script src="../../../libs/postshaders/RGBShiftShader.js"></script>
+  <script src="../../../libs/postprocessing/EffectComposer.js"></script>
+  <script src="../../../libs/postprocessing/RenderPass.js"></script>
+  <script src="../../../libs/postprocessing/MaskPass.js"></script>
+  <script src="../../../libs/postprocessing/ShaderPass.js"></script>
+  <script src="../../../libs/postprocessing/GlitchPass.js"></script>
+  <script src="index.js"></script>
+  </body>
+</html>
