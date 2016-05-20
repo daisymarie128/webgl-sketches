@@ -41,8 +41,7 @@ function init() {
     createTunnel();
     scene.add(tunnel);
 
-
-
+    // this is ourglitch effect
     renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio( window.devicePixelRatio );
     composer = new THREE.EffectComposer( renderer );
@@ -72,6 +71,7 @@ function createTunnel() {
         points.push(new THREE.Vector3(randomX, randomY, randomZ));
     }
 
+    // our texture is what we'll use to make the lines in the tunnel
     var texture = new THREE.TextureLoader().load( "pink-single-larger-01-01.png" );
     texture.wrapS = THREE.MirroredRepeatWrapping;
     // texture.wrapT = THREE.MirroredRepeatWrapping;
@@ -85,21 +85,23 @@ function createTunnel() {
     // Make our tube geometry from our spline
     tubeGeometry = new THREE.TubeGeometry(spline, segments, radius, radiusSegments, false);
 
-    // raindbow outline tunnel
-    // this is also good for seeing how our spline looks with the amount of segments etc.
-    material = new THREE.MeshNormalMaterial({
-        transparent: false,
-        opacity: 1,
-        side:THREE.DoubleSide,
-        wireframe: true
-    });
-
+    // make our material
     material = new THREE.MeshBasicMaterial({ 
         map: texture,
         transparent: false,
         opacity: 1,
         side:THREE.BackSide
     });
+
+    // raindbow outline tunnel
+    // this is also good for seeing how our spline looks with the amount of segments etc.
+    // material = new THREE.MeshNormalMaterial({
+    //     transparent: false,
+    //     opacity: 0.8,
+    //     side:THREE.DoubleSide,
+    //     wireframe: true
+    // });
+
 
     tunnel = new THREE.Mesh(tubeGeometry, material);
     console.log(tunnel)
