@@ -22,7 +22,7 @@ function init() {
     // set up our basic scene
     container = document.getElementById('container');
     camera = new THREE.PerspectiveCamera(45.0, window.innerWidth / window.innerHeight, 100, 1500.0);
-    camera.position.z = 980.0;
+    camera.position.z = 1080.0;
     scene = new THREE.Scene();
     renderer = new THREE.WebGLRenderer({
       antialias: true

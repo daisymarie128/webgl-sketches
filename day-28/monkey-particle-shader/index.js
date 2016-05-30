@@ -52,28 +52,25 @@ function init() {
   // import our blender object
   var purple = new THREE.Color( "#F50057" );
   var loader = new THREE.JSONLoader();
-  loader.load( "../../../models/monkey-subdivided2.json", function( geometry ) {
+  loader.load( "../../../models/monkey.json", function( geometry ) {
     var material = new THREE.MeshPhongMaterial( {
       color: purple,
       specular: purple
     } );
 
-    mesh = new THREE.Points( geometry, material );
-    // mesh.rotation.x = 90;
-    // mesh.scale.set( 20.5, 20.5, 20.5 );
-    scene.add( mesh );
-    mesh.rotation.x = 90
-    mesh.position.x = -2.5
-    mesh.position.y = -3
-    mesh.scale.set(2, 2, 2)
+    mesh = new THREE.Mesh( geometry, material );
+    // scene.add( mesh );
+    // mesh.rotation.x = 90
+    // mesh.position.x = -2.5
+    // mesh.position.y = -3
+    // mesh.scale.set(2, 2, 2)
     createParticles();
   });
 
-
   // add our lights to the scene
   // then setup our renderer
-  scene.add( light );
-  scene.add( light2 );
+  // scene.add( light );
+  // scene.add( light2 );
   scene.add( new THREE.HemisphereLight( darkGrey, teal ) );
   renderer = new THREE.WebGLRenderer( { antialias: true } );
   renderer.setPixelRatio( window.devicePixelRatio );
@@ -93,18 +90,21 @@ function init() {
 function createParticles() {
 
   // loop through geometries vertices
-  console.log(mesh)
-
   var vertices = mesh.geometry.vertices;
   var buffergeometry = new THREE.BufferGeometry();
+    for (var i = 0; i < vertices.length; i++) {
+    var vert = vertices[i];
+
+    var x = Math.random() * vert.x;
+    var y = Math.random() * vert.y;
+    var z = Math.random() * vert.z;
+
+    vertices.push(new THREE.Vector3( x, y, z ))
+  };
   var position = new THREE.Float32Attribute( vertices.length * 100, 3 ).copyVector3sArray( vertices );
   var customColor = new THREE.Float32Attribute( vertices.length * 100, 3 );
-  // var displacement = new THREE.Float32Attribute( vertices.length * 3, 3 );
   var color = new THREE.Color( 0xffffff );
 
-
-  // colors = new Float32Array(divisions * ball.faces.length * 3 * 3);
-  
   buffergeometry.addAttribute( 'position', position )
   // buffergeometry.addAttribute( 'displacement', displacement );
   buffergeometry.addAttribute( 'customColor', customColor );
@@ -114,42 +114,22 @@ function createParticles() {
     color.toArray( customColor.array, i * customColor.itemSize );
   };
 
-  uniforms = {
-    amplitude: { type: "f", value: 1.0 },
-    opacity:   { type: "f", value: 1.0 },
-    color:     { type: "c", value: new THREE.Color( 0xff0000 ) }
-  };
-
-  var shaderMaterial = new THREE.ShaderMaterial( {
-    uniforms:       uniforms,
-    vertexShader:   document.getElementById( 'vertexshader' ).textContent,
-    fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
-    blending:       THREE.AdditiveBlending,
-    depthTest:      false,
-    transparent:    true
-  });
-
-  // object = new THREE.Line( buffergeometry, shaderMaterial );
-  // var material = new THREE.MeshPhongMaterial( {
-  //     color: 0xffffff,
-  //     morphTargets: true,
-  //     vertexColors: THREE.FaceColors,
-  //     shading: THREE.FlatShading
-  //   } );
-  // var geometry = new THREE.BoxGeometry( 1, 1, 1 );
   var pink = new THREE.Color( "#1565C0" );
-  particleMaterial = new THREE.PointsMaterial( { 
+  particleMaterial = new THREE.PointsMaterial({ 
     color: pink,
     size: 0.08
-     } );
+  });
+
+
+
+
   var object = new THREE.Points( buffergeometry, particleMaterial );
   object.rotation.x = 90
-  object.position.x = 2.5
+  // object.position.x = 2.5
   object.position.y = -3
   object.scale.set(2, 2, 2)
   scene.add( object );
 }
-
 
 // resizes our renderer
 function onWindowResize( event ) {

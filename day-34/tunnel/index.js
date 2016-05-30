@@ -26,7 +26,7 @@ var cameraTravelIncrement   = 0.0002,
     radius = 30,
     // this is like quality of geometry
     // heigher number = smoother tube
-    radiusSegments = 30;
+    radiusSegments = 6;
 
 init();
 animate();

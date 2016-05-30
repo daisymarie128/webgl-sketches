@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Hello World</title>
+    <meta name="description" content="hello world for shader">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+
+    <p>Hellow world shader</p>
+    <div id="container"></div>
+    
+    <!-- Shaders -->
+  <script type="x-shader/x-vertex" id="vertexshader">
+    precision highp float;
+    uniform mat4 modelViewMatrix;
+    uniform mat4 projectionMatrix;
+    attribute vec3 position;
+    attribute vec2 uv;
+    attribute vec3 normal;
+    attribute vec3 translate;
+    attribute float scale;
+    attribute vec3 color;
+    varying vec2 vUv;
+    varying vec3 vColor;
+    void main() {
+      vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 );
+      mvPosition.xyz += position * scale;
+      vUv = uv;
+      vColor = color;
+      gl_Position = projectionMatrix * mvPosition;
+    }
+
+  </script>
+
+  <script type="x-shader/x-fragment" id="fragmentshader">
+    precision highp float;
+    uniform sampler2D map;
+    varying vec2 vUv;
+    varying vec3 vColor;
+    void main() {
+      vec4 diffuseColor = texture2D( map, vUv );
+      gl_FragColor = vec4( diffuseColor.xyz * vColor, diffuseColor.w );
+      if ( diffuseColor.w < 0.5 ) discard;
+    }
+
+  </script>
+
+  <!-- End Shaders -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.js"></script>
+  <script src="../../../libs/particles.js"></script>
+  <script src="../../../libs/controls.js"></script>
+  <script src="../../../libs/Animation.js"></script>
+  <script src="../../../libs/AnimationHandler.js"></script>
+  <script src="../../../libs/KeyFrameAnimation.js"></script>
+  <script src="../../../libs/ColladaLoader.js"></script>
+  <script src="index.js"></script>
+  </body>
+</html>
