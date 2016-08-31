@@ -1,7 +1,7 @@
 /* ----------------------------
-		
 
-		threejs 
+
+		threejs
         playing with a tunnel effect
 
 
@@ -26,7 +26,7 @@ var cameraTravelIncrement   = 0.0002,
     radius = 30,
     // this is like quality of geometry
     // heigher number = smoother tube
-    radiusSegments = 6;
+    radiusSegments = 3;
 
 init();
 animate();
@@ -86,7 +86,7 @@ function createTunnel() {
     tubeGeometry = new THREE.TubeGeometry(spline, segments, radius, radiusSegments, false);
 
     // make our material
-    material = new THREE.MeshBasicMaterial({ 
+    material = new THREE.MeshBasicMaterial({
         map: texture,
         transparent: false,
         opacity: 1,
@@ -120,7 +120,7 @@ function animate() {
     var position2 = spline.getPointAt(cameraTravelledStep + cameraTravelIncrement);
     camera.position.set(position1.x, position1.y, position1.z);
     camera.lookAt(position2);
-    
+
     // camera.rotation.z = -Math.PI/2 + (Math.sin(cameraRotationStep) * Math.PI);
     cameraTravelledStep += cameraTravelIncrement;
     cameraRotationStep += cameraRotationIncrement;
@@ -134,5 +134,3 @@ function render() {
     composer.render();
     // renderer.render( scene, camera );
 }
-
-

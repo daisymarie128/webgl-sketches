@@ -41,7 +41,7 @@ function init() {
   var darkGrey = new THREE.Color("#212121");
   var teal = new THREE.Color("#455A64");
   var light = new THREE.DirectionalLight(blue, 0.5);
-  var light2 = new THREE.DirectionalLight white, 1);
+  var light2 = new THREE.DirectionalLight(white, 1);
   light2.position.set(-2, -3, 1);
   light.position.set(1, 1, 1);
 
